@@ -1,0 +1,92 @@
+[
+  {
+    "id": "fund-01",
+    "title": "Vital Signs & Clinical Assessment",
+    "category": "Fundamentals",
+    "summary": "Core physiological parameters including BP, pulse, respiration rate, and body temperature protocols.",
+    "keyPoints": [
+      "Normal adult BP baseline: < 120/80 mmHg.",
+      "Normal pulse: 60–100 bpm.",
+      "Always assess baseline before administering cardiac medications."
+    ],
+    "readTime": "5 min read",
+    "resourceUrl": "https://openstax.org/details/books/clinical-nursing-skills",
+    "badgeBg": "#e0f2fe",
+    "badgeText": "#0369a1"
+  },
+  {
+    "id": "pharm-01",
+    "title": "Antihypertensive Classifications",
+    "category": "Pharmacology",
+    "summary": "Mechanisms, nursing considerations, and side effects for ACE inhibitors, Beta-blockers, and CCBs.",
+    "keyPoints": [
+      "ACE Inhibitors (-pril): Monitor for persistent dry cough and hyperkalemia.",
+      "Beta-Blockers (-olol): Check apical pulse prior to administration (hold if <60 bpm).",
+      "Calcium Channel Blockers: Monitor for peripheral edema and hypotension."
+    ],
+    "readTime": "7 min read",
+    "resourceUrl": "https://nurseslabs.com/nursing-notes/",
+    "badgeBg": "#fef3c7",
+    "badgeText": "#b45309"
+  },
+  {
+    "id": "mh-01",
+    "title": "Therapeutic Communication",
+    "category": "Mental Health",
+    "summary": "Verbal and non-verbal techniques to establish trust, active listening, and rapport in psychiatric care.",
+    "keyPoints": [
+      "Use open-ended statements to encourage patient expression.",
+      "Avoid offering false reassurance or unsolicited personal advice.",
+      "Utilize active silence and reflective clarifying statements."
+    ],
+    "readTime": "6 min read",
+    "resourceUrl": "https://nurseslabs.com/nursing-notes/",
+    "badgeBg": "#f3e8ff",
+    "badgeText": "#6b21a8"
+  },
+  {
+    "id": "fund-02",
+    "title": "Infection Control & Asepsis",
+    "category": "Fundamentals",
+    "summary": "Standard and transmission-based precautions, hand hygiene guidelines, and sterile field maintenance.",
+    "keyPoints": [
+      "Hand hygiene is the single most effective method to prevent healthcare-associated infections.",
+      "PPE donning order: Gown -> Mask -> Goggles/Shield -> Gloves.",
+      "PPE doffing order: Gloves -> Goggles/Shield -> Gown -> Mask."
+    ],
+    "readTime": "4 min read",
+    "resourceUrl": "https://openstax.org/details/books/clinical-nursing-skills",
+    "badgeBg": "#e0f2fe",
+    "badgeText": "#0369a1"
+  },
+  {
+    "id": "pharm-02",
+    "title": "Analgesic & Opioid Safety",
+    "category": "Pharmacology",
+    "summary": "Safe administration protocols for non-opioid and opioid analgesics, monitoring, and reversal agents.",
+    "keyPoints": [
+      "Assess respiratory status before administering opioid analgesics.",
+      "Naloxone is the opioid reversal agent for severe respiratory depression.",
+      "Monitor liver function tests for high-dose acetaminophen therapy."
+    ],
+    "readTime": "8 min read",
+    "resourceUrl": "https://nurseslabs.com/nursing-notes/",
+    "badgeBg": "#fef3c7",
+    "badgeText": "#b45309"
+  },
+  {
+    "id": "mh-02",
+    "title": "Anxiety & Crisis Intervention",
+    "category": "Mental Health",
+    "summary": "Recognizing continuum levels of anxiety and applying crisis de-escalation strategies.",
+    "keyPoints": [
+      "Severe anxiety or panic requires short, clear, and direct communication.",
+      "Maintain patient and environment safety during acute crisis states.",
+      "Guide deep breathing and grounding exercises once severe panic de-escalates."
+    ],
+    "readTime": "6 min read",
+    "resourceUrl": "https://nurseslabs.com/nursing-notes/",
+    "badgeBg": "#f3e8ff",
+    "badgeText": "#6b21a8"
+  }
+]
