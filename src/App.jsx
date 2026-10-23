@@ -1,7 +1,10 @@
-import React, { useState, useMemo } from 'react';
-import topicData from './data/topics.json';
-
-const CATEGORIES = ['All', 'Fundamentals', 'Pharmacology', 'Mental Health'];
+import React, { useState, useEffect, useMemo } from 'react';
+import Header from './components/Header';
+import SearchBar from './components/SearchBar';
+import CategoryFilter from './components/CategoryFilter';
+import TopicList from './components/TopicList';
+import ScheduleWidget from './components/ScheduleWidget';
+import topicDataJSON from './data/topics.json';
 
 export default function App() {
   const [userName, setUserName] = useState('Favour');
@@ -11,10 +14,13 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  // Track completed topics
-  const [completedTopicIds, setCompletedTopicIds] = useState([]);
+  // Week 2 Asynchronous Data Loading States
+  const [topics, setTopics] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Schedule state
+  // Completed topics & Schedule states
+  const [completedTopicIds, setCompletedTopicIds] = useState([]);
   const [selectedDate, setSelectedDate] = useState('2026-10-16');
   const [schedules, setSchedules] = useState([
     { id: 1, date: '2026-10-16', time: '10:00 AM', event: 'Pharmacology Review' },
@@ -24,7 +30,25 @@ export default function App() {
   const [newEventTitle, setNewEventTitle] = useState('');
   const [showScheduleModal, setShowScheduleModal] = useState(false);
 
-  // Handle instant name saving on Enter or Blur
+  const loadTopicsData = () => {
+    setIsLoading(true);
+    setError(null);
+
+    setTimeout(() => {
+      try {
+        setTopics(topicDataJSON);
+        setIsLoading(false);
+      } catch (err) {
+        setError('Failed to load nursing topics. Please check your connection.');
+        setIsLoading(false);
+      }
+    }, 800);
+  };
+
+  useEffect(() => {
+    loadTopicsData();
+  }, []);
+
   const handleNameSave = (e) => {
     if (e.key === 'Enter' || e.type === 'blur') {
       if (tempName.trim()) setUserName(tempName.trim());
@@ -55,15 +79,14 @@ export default function App() {
     setShowScheduleModal(false);
   };
 
-  const totalTopicsCount = topicData.length;
+  const totalTopicsCount = topics.length;
   const completedCount = completedTopicIds.length;
-  const progressPercentage = Math.round((completedCount / totalTopicsCount) * 100);
+  const progressPercentage = totalTopicsCount > 0 ? Math.round((completedCount / totalTopicsCount) * 100) : 0;
 
-  // Fixed Global Deep Search across all properties
   const filteredTopics = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     
-    return topicData.filter((topic) => {
+    return topics.filter((topic) => {
       const matchesCategory =
         selectedCategory === 'All' || topic.category === selectedCategory;
 
@@ -76,7 +99,7 @@ export default function App() {
 
       return matchesCategory && (titleMatch || categoryMatch || summaryMatch || keyPointsMatch);
     });
-  }, [searchQuery, selectedCategory]);
+  }, [topics, searchQuery, selectedCategory]);
 
   const activeDaySchedules = useMemo(() => {
     return schedules.filter((s) => s.date === selectedDate);
@@ -84,7 +107,6 @@ export default function App() {
 
   return (
     <div className="db-wrapper">
-      {/* Mobile Top Header Toggle */}
       <div className="mobile-top-bar">
         <div className="brand-logo">
           <span className="logo-text">NurseStudy</span>
@@ -97,7 +119,6 @@ export default function App() {
         </button>
       </div>
 
-      {/* Sidebar Navigation */}
       <aside className={`db-sidebar ${mobileNavOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-top">
           <div className="brand-logo desktop-only">
@@ -122,140 +143,59 @@ export default function App() {
         </div>
 
         <div className="sidebar-widget">
-          <div className="widget-title">Study Habit</div>
-          <p className="widget-sub">Open notes daily to increase your revision score.</p>
+          <div className="widget-title">Week 2 Build</div>
+          <p className="widget-sub">Modular components & async data loading active.</p>
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <main className="db-main">
-        {/* TAB 1: DASHBOARD */}
         {activeTab === 'Dashboard' && (
           <>
-            {/* Unified Hero & User Profile Header Banner */}
-            <section className="dashboard-hero-unified">
-              <div className="hero-top-row">
-                <div className="user-profile-badge">
-                  <div className="avatar-placeholder">NS</div>
-                  <div className="user-info">
-                    <span className="user-label">Student Profile</span>
-                    <input
-                      type="text"
-                      className="user-name-input"
-                      value={tempName}
-                      onChange={(e) => setTempName(e.target.value)}
-                      onKeyDown={handleNameSave}
-                      onBlur={handleNameSave}
-                      placeholder="Type name + Enter"
-                      title="Type name and press Enter to save"
-                    />
-                  </div>
-                </div>
+            <Header 
+              tempName={tempName}
+              userName={userName}
+              handleNameSave={handleNameSave}
+              setTempName={setTempName}
+              completedCount={completedCount}
+              totalTopicsCount={totalTopicsCount}
+            />
 
-                <div className="hero-chip">
-                  <span>Progress:</span> <strong>{completedCount} of {totalTopicsCount} Completed</strong>
-                </div>
-              </div>
+            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-              <div className="hero-greeting">
-                <h1>Hi, Nurse {userName}! 👋</h1>
-                <p>Welcome to your centralized nursing study hub. Search topics or filter by subject below.</p>
-              </div>
-
-              {/* Unified Search Control inside Dashboard Hero */}
-              <div className="hero-search-box">
-                <span className="search-icon">🔍</span>
-                <input
-                  type="search"
-                  placeholder="Search keywords (e.g. BP, ACE)..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  aria-label="Search nursing topics"
-                />
-              </div>
-            </section>
-
-            <div className="db-grid-container">
+            <div className="db-grid-container" style={{ marginTop: '1.5rem' }}>
               <div className="db-primary-col">
                 <div className="section-header">
                   <h2>Explore Subjects</h2>
-                  <div className="category-pills">
-                    {CATEGORIES.map((cat) => (
-                      <button
-                        key={cat}
-                        className={`pill ${selectedCategory === cat ? 'active' : ''}`}
-                        onClick={() => setSelectedCategory(cat)}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
+                  <CategoryFilter 
+                    selectedCategory={selectedCategory} 
+                    setSelectedCategory={setSelectedCategory} 
+                  />
                 </div>
 
-                {filteredTopics.length > 0 ? (
-                  <div className="cards-grid">
-                    {filteredTopics.map((topic) => {
-                      const isCompleted = completedTopicIds.includes(topic.id);
-                      return (
-                        <div className={`dashboard-card ${isCompleted ? 'completed-card' : ''}`} key={topic.id}>
-                          <div>
-                            <div className="card-header">
-                              <span
-                                className="badge"
-                                style={{
-                                  backgroundColor: topic.badgeBg,
-                                  color: topic.badgeText,
-                                }}
-                              >
-                                {topic.category}
-                              </span>
-                              <span className="read-time">{topic.readTime}</span>
-                            </div>
-
-                            <h3>{topic.title}</h3>
-                            <p className="summary">{topic.summary}</p>
-
-                            <ul className="points">
-                              {topic.keyPoints.map((point, idx) => (
-                                <li key={idx}>{point}</li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div className="card-footer">
-                            <a
-                              href={topic.resourceUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn-open"
-                              onClick={() => handleOpenTopic(topic.id)}
-                            >
-                              {isCompleted ? 'Reviewed ✓' : 'Open Notes ↗'}
-                            </a>
-                            <span className="quiz-pill">Quiz in W3</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
+                {isLoading ? (
                   <div className="empty-state-box">
-                    <h3>No nursing topics found</h3>
-                    <p>No results matching "{searchQuery}". Try searching another keyword or reset filters.</p>
-                    <button
-                      className="reset-btn"
-                      onClick={() => {
-                        setSearchQuery('');
-                        setSelectedCategory('All');
-                      }}
-                    >
-                      Reset Search & Filters
+                    <h3>Loading nursing topics...</h3>
+                    <p>Please wait while we fetch the asynchronous dataset.</p>
+                  </div>
+                ) : error ? (
+                  <div className="empty-state-box">
+                    <h3 style={{ color: '#dc2626' }}>Data Loading Error</h3>
+                    <p>{error}</p>
+                    <button className="reset-btn" onClick={loadTopicsData}>
+                      Retry Loading
                     </button>
                   </div>
+                ) : (
+                  <TopicList 
+                    topics={filteredTopics}
+                    completedTopicIds={completedTopicIds}
+                    onOpenTopic={handleOpenTopic}
+                    searchQuery={searchQuery}
+                    onReset={() => { setSearchQuery(''); setSelectedCategory('All'); }}
+                  />
                 )}
               </div>
 
-              {/* Right Sidebar Widgets */}
               <aside className="db-right-col">
                 <div className="widget-card stats-card">
                   <h3>Revision Progress</h3>
@@ -272,108 +212,39 @@ export default function App() {
                   <p className="progress-text">{completedCount} of {totalTopicsCount} Topics Reviewed</p>
                 </div>
 
-                <div className="widget-card schedule-card">
-                  <div className="schedule-header">
-                    <h3>Upcoming Schedule</h3>
-                    <button className="add-btn" onClick={() => setShowScheduleModal(true)}>+ Add</button>
-                  </div>
-
-                  <div className="calendar-picker">
-                    <label htmlFor="schedule-date">Select Date:</label>
-                    <input
-                      type="date"
-                      id="schedule-date"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                    />
-                  </div>
-
-                  {activeDaySchedules.length > 0 ? (
-                    <ul className="schedule-list">
-                      {activeDaySchedules.map((item) => (
-                        <li key={item.id}>
-                          <span className="time">{item.time}</span>
-                          <span className="event">{item.event}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="no-schedule">No study events scheduled for this day.</p>
-                  )}
-                </div>
+                <ScheduleWidget 
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                  schedules={schedules}
+                  activeDaySchedules={activeDaySchedules}
+                  setShowScheduleModal={setShowScheduleModal}
+                />
               </aside>
             </div>
           </>
         )}
 
-        {/* TAB 2: SUBJECTS */}
         {activeTab === 'Subjects' && (
           <div className="tab-page">
             <h2>Nursing Curriculum Subjects</h2>
             <p className="sub-text">Select any subject category to view filtered modules instantly.</p>
-            <div className="subjects-grid">
-              {CATEGORIES.filter(c => c !== 'All').map(cat => (
-                <div className="subject-box" key={cat}>
-                  <h3>{cat}</h3>
-                  <p>{topicData.filter(t => t.category === cat).length} Topics Available</p>
-                  <button className="reset-btn" onClick={() => { setSelectedCategory(cat); setActiveTab('Dashboard'); }}>
-                    Explore Topics
-                  </button>
-                </div>
-              ))}
-            </div>
           </div>
         )}
 
-        {/* TAB 3: LIBRARY */}
         {activeTab === 'Library' && (
           <div className="tab-page">
             <h2>Open Access Study Library</h2>
-            <p className="sub-text">Direct links to peer-reviewed nursing guides and reference manuals.</p>
-            <div className="cards-grid">
-              {topicData.map(topic => (
-                <div className="dashboard-card" key={topic.id}>
-                  <div>
-                    <span className="badge" style={{ backgroundColor: topic.badgeBg, color: topic.badgeText }}>
-                      {topic.category}
-                    </span>
-                    <h3 style={{ marginTop: '0.5rem' }}>{topic.title}</h3>
-                    <p className="summary">{topic.summary}</p>
-                  </div>
-                  <div className="card-footer" style={{ marginTop: '1rem' }}>
-                    <a href={topic.resourceUrl} target="_blank" rel="noopener noreferrer" className="btn-open">
-                      Open External Notes ↗
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <p className="sub-text">Direct links to peer-reviewed nursing guides.</p>
           </div>
         )}
 
-        {/* TAB 4: SETTINGS */}
         {activeTab === 'Settings' && (
           <div className="tab-page">
             <h2>Account Preferences</h2>
-            <p className="sub-text">Customize your local student profile settings.</p>
-            <div className="settings-box">
-              <label>Update Student Name (Press Enter to Save)</label>
-              <input
-                type="text"
-                className="settings-input"
-                value={tempName}
-                onChange={(e) => setTempName(e.target.value)}
-                onKeyDown={handleNameSave}
-                onBlur={handleNameSave}
-              />
-              <p className="sub-text" style={{ marginTop: '0.5rem', color: '#10b981' }}>
-                Current Saved Name: <strong>{userName}</strong>
-              </p>
-            </div>
+            <p className="sub-text">Customize your student profile settings.</p>
           </div>
         )}
 
-        {/* Schedule Modal */}
         {showScheduleModal && (
           <div className="modal-overlay">
             <div className="modal-content">
